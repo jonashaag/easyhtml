@@ -1,0 +1,31 @@
+name: htmlpre
+version: 1.0
+cabal-version: 1.22
+build-type: Simple
+license: AllRightsReserved
+stability: experimental
+x-ghc-framework-version: 8.0.2-8.9-3
+x-last-ide-version: HfM1.5.1
+Executable htmlpre
+  main-is: Parser.hs
+  buildable: True
+  build-depends:
+      Glob -any,
+      HUnit -any,
+      directory -any,
+      regex-posix -any,
+      Diff -any,
+      tagsoup -any,
+      text -any,
+      base -any,
+      indents -any,
+      parsec -any,
+      groom -any,
+      ansi-terminal -any,
+      filepath -any
+  default-language: Haskell2010
+  other-modules:
+      Parser2
+      Unit
+      Convert
+      HUnitDiff

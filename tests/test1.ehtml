@@ -1,0 +1,20 @@
+html
+  head
+    link/ rel="stylesheet" href="foo"
+    link/ rel="stylesheet" href="bar"
+  body
+    p
+      Some text
+    p
+      Some other text
+      Continued
+    p
+      More text
+      a
+        With link
+    p
+      Text
+      br/
+      a
+        Some link
+      ' lower case text
