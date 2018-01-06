@@ -25,7 +25,6 @@ Executable htmlpre
       filepath -any
   default-language: Haskell2010
   other-modules:
-      Parser2
       Unit
       Convert
       HUnitDiff

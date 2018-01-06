@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Unit where
 
 import System.FilePath.Glob
@@ -11,9 +12,9 @@ import HUnitDiff
 t s f = unpack $ f $ pack s
 
 getTestFiles :: IO [(String,String)]
-getTestFiles = map inAndOut <$> glob "**/*.ehtml"
+getTestFiles = map inAndOut <$> glob "**/*.e*"
   where
-    inAndOut f = (f, t f (dropEnd 5) ++ "html")
+    inAndOut f = (f, t f $ replace ".e" ".")
     
 mkTestCase (i, o) = TestCase $ assertEqualDiffUnified' "" o (genHtml $ parseEHtml i)
 

@@ -1,0 +1,50 @@
+!ehtml: enable-titlecase
+// https://github.com/clintonwoo/hackernews-react-graphql/blob/master/src/components/presentational/HeaderNav.js
+    span className="pagetop"
+      b className="hnname"
+        Link prefetch href="/" as="/news"
+          a
+            {props.title}
+      &nbsp;
+      {props.userId &&
+        Link prefetch href="/newswelcome"
+          a
+            ' welcome
+      }
+      {props.userId && ' | '}
+      Link prefetch href="/newest"
+        a className={props.currentURL === '/newest' ? 'topsel' : ''}
+          ' new
+      {props.userId && ' | '}
+      {props.userId &&
+        Link prefetch href={`/threads?id=${props.userId}`}
+          a className={props.currentURL === '/threads' ? 'topsel' : ''}
+            ' threads
+      }
+      {' | '}
+      Link prefetch href="/newcomments"
+        a className={props.currentURL === '/newcomments' ? 'topsel' : ''}
+          ' comments
+      {' | '}
+      Link prefetch href="/show"
+        a className={props.currentURL === '/show' ? 'topsel' : ''}
+          ' show
+      {' | '}
+      Link prefetch href="/ask"
+        a className={props.currentURL === '/ask' ? 'topsel' : ''}
+          ' ask
+      {' | '}
+      Link prefetch href="/jobs"
+        a className={props.currentURL === '/jobs' ? 'topsel' : ''}
+          ' jobs
+      {' | '}
+      Link prefetch href="/submit"
+        a className={props.currentURL === '/submit' ? 'topsel' : ''}
+          ' submit
+      {props.currentURL === '/best' && ' | '}
+      {props.currentURL === '/best' && (
+          Link prefetch href="/best"
+             a className="topsel"
+              ' best
+        )
+      }

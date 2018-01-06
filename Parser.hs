@@ -107,10 +107,35 @@ withArbitrarilyIndentedBlock' f a p = withArbitrarilyIndentedBlock f (a <* space
 
 
 
+data Opts = Opts {
+  enableTitlecase :: Bool
+}
+
+defaultOpts = Opts { enableTitlecase = False }
+
+pOptLine = matchOpt <$> (string "!ehtml: " *> many1 (noneOf "\n") <* spaces)
+  where
+    matchOpt "enable-titlecase" o = o { enableTitlecase = True }
+    matchOpts opt               _ = error $ "Unknown ehtml option: " ++ opt
+
+parseOpts = composeF defaultOpts <$> many1 pOptLine
+  where
+    composeF = foldl (flip ($))
+    
+
 
 pAttrs = option "" (try $ spaces' *> untilEol1)
 
-pTagName = many1 lower
+pTagName opts
+  = if enableTitlecase opts
+    then lowercaseTagName <|> titlecaseTagName
+    else lowercaseTagName
+  where
+    lowercaseTagName = many1 lower
+    titlecaseTagName = do
+      first <- upper
+      rest <- many lower
+      return $ first : rest
 
 pVoidElementClose = try $ char '/'
 
@@ -125,28 +150,29 @@ pSmartText = HtmlRaw <$> untilEol1
 
 pBlankLine = HtmlRaw "\n" <$ newline
 
-pTag = withPos $ pBlankLine <||> pHtmlVoidElement <||> pHtmlElement <||> pVerbatimText <||> pSmartText
+pTag opts = withPos $ pBlankLine <||> pHtmlVoidElement <||> pHtmlElement <||> pVerbatimText <||> pSmartText
   where
     pHtmlVoidElement = HtmlVoidElement
-      <$> pTagName
+      <$> pTagName opts
       <*  pVoidElementClose
       <*> pAttrs
     pHtmlElement = do
-      withArbitrarilyIndentedBlock' ($) (HtmlElement <$> pTagName <*> pAttrs) pChildTag
+      withArbitrarilyIndentedBlock' ($) (HtmlElement <$> pTagName opts <*> pAttrs) (pChildTag opts)
 
-pChildTag = pTag <||> pSmartText
+pChildTag opts = pTag opts <||> pSmartText
 
-pEHtmlLine = do
+pEHtmlLine opts = do
   spaces'
   sourceCol <- sourceColumn <$> getPosition
-  line <- pTag <* spaces
+  line <- pTag opts <* spaces
   return $ WhitespaceOffset (sourceCol - 1) line
-  
 
 parseEHtml :: String -> [HTML]
 parseEHtml = right . runIndentParser parser () ""
   where
-    parser = (many1 pEHtmlLine <* eof)
+    parser = do
+      opts <- option defaultOpts $ try parseOpts
+      many1 (pEHtmlLine opts) <* eof
 
 genHtml :: [HTML] -> String
 genHtml html = intercalate "\n" (map show html) ++ "\n"
